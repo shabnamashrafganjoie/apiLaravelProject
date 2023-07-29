@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Category extends Model
+class Transaction extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $table='categories';
+    protected $table='transactions';
     protected $guarded=[];
 
 }
