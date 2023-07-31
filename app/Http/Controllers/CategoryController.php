@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
+use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Failed;
 use Illuminate\Support\Facades\DB;
-use App\Http\Resources\BrandResource;
-use App\Http\Controllers\ApiController;
+use App\Http\Resources\CategoryResource;
 use Illuminate\Support\Facades\Validator;
 
-class BrandController extends ApiController
+class CategoryController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -19,15 +17,13 @@ class BrandController extends ApiController
      */
     public function index()
     {
-        $brands=Brand::paginate(10);
+        $categories=Category::paginate(10);
 
         return $this->successResponse([
-            'brands' => BrandResource::collection($brands),
-            'links' => BrandResource::collection($brands)->response()->getData()->links,
-            'meta' => BrandResource::collection($brands)->response()->getData()->meta,
+            'categories' => CategoryResource::collection($categories),
+            'links' => CategoryResource::collection($categories)->response()->getData()->links,
+            'meta' => CategoryResource::collection($categories)->response()->getData()->meta,
         ]);
-
-
     }
 
     /**
@@ -38,11 +34,12 @@ class BrandController extends ApiController
      */
     public function store(Request $request)
     {
-
         $validator=Validator::make($request->all(),[
 
-            'name' => 'required' ,
-            'display_name' => 'required|unique:brands'
+            'name' => 'required|string' ,
+            'parent_id' => 'required|integer',
+            'description' => 'string'
+
         ]);
 
         if($validator ->fails()){
@@ -52,13 +49,14 @@ class BrandController extends ApiController
 
 
         DB::BeginTransaction();
-        $brand = Brand::create([
+        $category = Category::create([
             'name' => $request -> name,
-            'display_name' => $request -> display_name
+            'parent_id' => $request -> parent_id,
+            'description' => $request->description,
         ]);
         DB::commit();
 
-        return $this->successResponse(new BrandResource($brand),201);
+        return $this->successResponse(new CategoryResource($category),201);
 
     }
 
@@ -68,9 +66,10 @@ class BrandController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Brand $brand)
+    public function show(Category $category)
     {
-        return $this->successResponse(new BrandResource($brand) );
+        return $this->successResponse(new CategoryResource($category) );
+
     }
 
     /**
@@ -80,13 +79,14 @@ class BrandController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Brand $brand)
+    public function update(Request $request, Category $category)
     {
-        
         $validator=Validator::make($request->all(),[
 
-            'name' => 'required' ,
-            'display_name' => 'required|unique:brands'
+            'name' => 'required|string' ,
+            'parent_id' => 'required|integer',
+            'description' => 'string'
+
         ]);
 
         if($validator ->fails()){
@@ -96,14 +96,14 @@ class BrandController extends ApiController
 
 
         DB::BeginTransaction();
-        $brand ->update([
+        $category ->update([
             'name' => $request -> name,
-            'display_name' => $request -> display_name
+            'parent_id' => $request -> parent_id,
+            'description' => $request->description,
         ]);
         DB::commit();
 
-        return $this->successResponse(new BrandResource($brand),200);
-
+        return $this->successResponse(new CategoryResource($category),200);
     }
 
     /**
@@ -112,16 +112,13 @@ class BrandController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Brand $brand)
+    public function destroy(Category $category)
     {
 
         DB::BeginTransaction();
-
-        $brand->delete();
-
+        $category->delete();
         DB::commit();
 
-        return $this->successResponse(new BrandResource($brand),200);
-
+        return $this->successResponse(new CategoryResource($category),200);
     }
 }
