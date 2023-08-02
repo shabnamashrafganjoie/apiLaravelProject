@@ -225,4 +225,8 @@ class ProductController extends ApiController
         return $this->successResponse(new ProductResource($product),200);
 
     }
+
+
+
+
 }

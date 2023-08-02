@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Support\Facades\DB;
@@ -124,4 +125,11 @@ class BrandController extends ApiController
         return $this->successResponse(new BrandResource($brand),200);
 
     }
+
+
+    public function product(Brand $brand){
+
+        return $this->successResponse(new BrandResource($brand->load('products')));
+
+  }
 }
