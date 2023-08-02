@@ -11,6 +11,7 @@ use App\Traits\ApiResponser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -78,6 +79,12 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof QueryException) {
+            DB::rollBack();
+            return $this->errorResponse($e->getMessage(), 500);
+        }
+
+
+        if ($e instanceof RelationNotFoundException) {
             DB::rollBack();
             return $this->errorResponse($e->getMessage(), 500);
         }
