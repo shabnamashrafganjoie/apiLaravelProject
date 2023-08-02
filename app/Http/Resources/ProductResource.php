@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\ProductImageResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
@@ -25,6 +26,7 @@ class ProductResource extends JsonResource
             'quantity' => $this->quantity,
             'description' => $this->description,
             'delivery_amount' => $this->delivery_amount,
+            'images' => ProductImageResource::collection($this->whenLoaded('images'))
         ];
     }
 }

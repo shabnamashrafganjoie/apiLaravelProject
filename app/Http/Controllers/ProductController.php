@@ -23,7 +23,7 @@ class ProductController extends ApiController
         $products=Product::paginate(10);
 
         return $this->successResponse([
-            'products' => ProductResource::collection($products),
+            'products' => ProductResource::collection($products->load('images')),
             'links' => ProductResource::collection($products)->response()->getData()->links,
             'meta' => ProductResource::collection($products)->response()->getData()->meta,
         ]);
@@ -112,7 +112,7 @@ class ProductController extends ApiController
      */
     public function show(Product $product)
     {
-        return $this->successResponse(new productResource($product) );
+        return $this->successResponse(new productResource($product->load('images')) );
 
     }
 
@@ -125,10 +125,19 @@ class ProductController extends ApiController
      */
     public function update(Request $request, Product $product)
     {
+
+
         $validator=Validator::make($request->all(),[
 
-            'name' => 'required' ,
-            'display_name' => 'required|unique:brands'
+            'name' => 'string',
+            'brand_id' => 'integer',
+            'category_id' => 'integer',
+            'primary_image' => 'nullable|image',
+            'price' => 'integer',
+            'quantity' => 'integer',
+            'delivery_amount' => 'nullable|integer',
+            'description' => 'required',
+            'images.*' => 'nullable|image'
         ]);
 
         if($validator ->fails()){
@@ -137,11 +146,63 @@ class ProductController extends ApiController
         }
 
 
+ 
+
+
         DB::BeginTransaction();
-        $product ->update([
-            'name' => $request -> name,
-            'display_name' => $request -> display_name
+
+
+   
+
+
+        if($request->has('primary_image')){
+
+
+        $primaryImageName = Carbon::now()->microsecond . '.' . $request->primary_image->extension();
+        $request->primary_image->storeAs('images/products', $primaryImageName, 'public');
+        }
+
+        if($request->has('images')){
+
+            $fileNameImages=[];
+            foreach($request->images as $image){
+                $fileNameImage = Carbon::now()->microsecond . '.' . $image->extension();
+                $image->storeAs('images/products', $fileNameImage, 'public');
+                array_push($fileNameImages,$fileNameImage);
+
+
+            }
+
+        }
+
+        $product -> update([
+            'name' => $request->name,
+            'brand_id' => $request->brand_id,
+            'category_id' => $request->category_id,
+            'primary_image' => $request->has('primary_image') ? $primaryImageName : $product->primary_image,
+            'price' => $request->price,
+            'quantity' => $request->quantity,
+            'delivery_amount' => $request->delivery_amount,
+            'description' => $request->description,
         ]);
+
+
+        if($request->has('images')){
+            foreach($product->images as $ProductImage){
+                $ProductImage->delete();
+
+            }
+        }
+
+
+        if ($request->has('images')) {
+            foreach ($fileNameImages as $fileNameImage) {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image' => $fileNameImage
+                ]);
+            }
+        }
         DB::commit();
 
         return $this->successResponse(new ProductResource($product),200);
