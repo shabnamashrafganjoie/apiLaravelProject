@@ -10,13 +10,28 @@ Route::get('/payment/verify',[PaymentController::class,'verify']);
 
 Route::get('/payment/verify', function (Request $request) {
 
-    $response=Http::post('http://localhost:8000/api/payment/verify',[
-        'refid' => $request->refid,
-    ]);
+    $response=Http::post('http://localhost:8000/api/payment/verify', [ 
+        
+        'clientrefid' => $request->clientrefid,
+       
+        'refid' => $request->refid
+        
+]);
 
-    dd($response);
+return $response;
     
+
+
+    // $response = Http::post('http://localhost:8000/api/payment/verify' , [
+    //     'clientrefid' => $request->clientrefid,
+    //     'refid' => $request->refid
+    // ]);
+
+    //dd($response);
 });
+
+
+
 
 
 
