@@ -26,6 +26,8 @@ Route::apiResource('products',ProductController::class);
 
 
 Route::post('/payment/send',[PaymentController::class,'send']);
+Route::post('/payment/verify',[PaymentController::class,'verify']);
+
 
 
 
