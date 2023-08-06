@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use GuzzleHttp\Psr7\Response;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends ApiController
@@ -41,18 +42,23 @@ class PaymentController extends ApiController
 
         $payingAmount = $totalAmount + $deliveryAmount;
 
-        dd( $totalAmount, $deliveryAmount,$payingAmount );
+        $amounts=[
+
+            'totalAmount' => $totalAmount,
+            'deliveryAmount' => $deliveryAmount,
+            'payingAmount' => $payingAmount,
+
+
+        ];
+
+        //dd( $totalAmount, $deliveryAmount,$payingAmount );
 
 
 
 
         
-
-        if (isset($_POST['amount'])) {
-            $amount = $_POST['amount'];
-        } else {
-            $amount = 1000;
-        }
+        $amount=$payingAmount;
+      
         if (isset($_POST['clientRefId'])) {
             $clientRefId = $_POST['clientRefId'];
         } else {
@@ -118,7 +124,11 @@ class PaymentController extends ApiController
                     $response = json_decode( $response, true );
                     if (isset($response) and $response != '') {
                         $response = $response['code'];
-        //شروع مرحله دو
+
+                   //صدازدن متد کرییت برای اضافه کردن در جدول
+                    $createOrder= OrderController::create($request,$amounts,$response);
+                        
+                        //شروع مرحله دو
                         $newURL = 'https://api.payping.ir/v1/pay/gotoipg/' . $response;
 
                         header('Location: ' . $newURL);
