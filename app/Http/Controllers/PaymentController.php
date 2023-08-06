@@ -24,13 +24,24 @@ class PaymentController extends ApiController
             return $this->errorResponse($validator->messages(), 422);
         }
 
-
+        $totalAmount = 0;
+        $deliveryAmount = 0;
 
         foreach ($request->order_items as $orderItem) {
             $product = Product::findOrFail($orderItem['product_id']);
             if ($product->quantity < $orderItem['quantity']) {
                 return $this->errorResponse('The product quantity is incorrect', 422);
-            }}
+            }
+        
+            $totalAmount += $product->price * $orderItem['quantity'];
+            $deliveryAmount += $product->delivery_amount;
+        
+        }
+
+
+        $payingAmount = $totalAmount + $deliveryAmount;
+
+        dd( $totalAmount, $deliveryAmount,$payingAmount );
 
 
 
