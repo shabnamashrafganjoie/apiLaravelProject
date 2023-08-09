@@ -20,7 +20,9 @@ return new class extends Migration
             $table->unsignedInteger('total_amount');
             $table->unsignedInteger('delivery_amount')->default(0);
             $table->unsignedInteger('paying_amount');
-            $table->tinyInteger('payment_status')->default(0);
+            $table->Integer('payment_status')->default(0);
+            $table->string('payment_msg');
+
             $table->softDeletes();
             $table->timestamps();
         });

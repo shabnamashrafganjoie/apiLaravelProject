@@ -18,7 +18,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade')->onUpdate('cascade');
             $table->unsignedInteger('amount');
-            $table->string('token')->nullable();
+            $table->string('code')->nullable();
+            $table->string('client_refid')->nullable();
+            $table->string('refid')->nullable();
             $table->string('trans_id')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->string('request_from')->default('web');
