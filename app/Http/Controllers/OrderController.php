@@ -152,6 +152,20 @@ $fin=Transaction::where('client_refid',$clientRefId)->first();
             $find_record=Transaction::where('client_refid',$request->clientRefId)->first();
             $order_id=$find_record->order_id;
 
+            $order_items=OrderItem::where('order_id',$order_id)->get();
+            foreach($order_items as $item){
+                $order_quantity=$item->quantity;
+                $product=Product::where('id',$item->product_id)->first();
+                $product_quantity=$product['quantity'];
+                $final_quantity=$product_quantity - $order_quantity;
+                $product->update([
+                    'quantity' => $final_quantity,
+                ]);
+
+                
+
+            }
+
             $find_record->update([
 
                 'refid'=>$request->refId,
@@ -178,6 +192,10 @@ $fin=Transaction::where('client_refid',$clientRefId)->first();
             DB::beginTransaction();
             $find_record=Transaction::where('client_refid',$request->clientRefId)->first();
             $order_id=$find_record->order_id;
+
+
+     
+            
 
             $find_record->update([
 
